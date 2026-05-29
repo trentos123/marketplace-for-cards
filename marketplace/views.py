@@ -1,86 +1,87 @@
-import stripe
-from django.conf import settings
-from django.shortcuts import render, redirect
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
 from django.contrib.auth.models import User
 
-from .models import Card, CartItem, Order
-
-stripe.api_key = settings.STRIPE_SECRET_KEY
+from .models import Card, CartItem
 
 
+# =========================
+# HOME (MARKETPLACE LISTING)
+# =========================
 def home(request):
+    query = request.GET.get("q")
+    sort = request.GET.get("sort")
+
     cards = Card.objects.all()
 
-    q = request.GET.get("q")
-    rarity = request.GET.get("rarity")
-    max_price = request.GET.get("max_price")
+    if query:
+        cards = cards.filter(title__icontains=query)
 
-    if q:
-        cards = cards.filter(title__icontains=q)
+    if sort == "price_low":
+        cards = cards.order_by("price")
+    elif sort == "price_high":
+        cards = cards.order_by("-price")
+    else:
+        cards = cards.order_by("-created_at")
 
-    if rarity:
-        cards = cards.filter(rarity=rarity)
-
-    if max_price:
-        cards = cards.filter(price__lte=max_price)
-
-    return render(request, "marketplace/home.html", {"cards": cards})
-
-
-def card_detail(request, pk):
-    card = Card.objects.get(id=pk)
-    return render(request, "marketplace/card_detail.html", {"card": card})
-
-
-@login_required
-def cart(request):
-    items = CartItem.objects.filter(user=request.user)
-    total = sum(i.card.price * i.quantity for i in items)
-
-    return render(request, "marketplace/cart.html", {
-        "items": items,
-        "total": total
+    return render(request, "marketplace/home.html", {
+        "cards": cards
     })
 
 
+# =========================
+# CARD DETAIL PAGE
+# =========================
+def detail(request, pk):
+    card = get_object_or_404(Card, pk=pk)
+    return render(request, "marketplace/detail.html", {
+        "card": card
+    })
+
+
+# =========================
+# CREATE CARD (SELLER UPLOAD)
+# =========================
 @login_required
-def checkout(request):
-    items = CartItem.objects.filter(user=request.user)
+def create(request):
+    if request.method == "POST":
+        title = request.POST.get("title")
+        description = request.POST.get("description")
+        price = request.POST.get("price")
+        image = request.FILES.get("image")
 
-    line_items = []
-    total = 0
+        Card.objects.create(
+            title=title,
+            description=description,
+            price=price,
+            image=image,
+            seller=request.user
+        )
 
-    for i in items:
-        total += i.card.price * i.quantity
+        return redirect("home")
 
-        line_items.append({
-            "price_data": {
-                "currency": "usd",
-                "product_data": {"name": i.card.title},
-                "unit_amount": int(i.card.price * 100),
-            },
-            "quantity": i.quantity,
-        })
-
-    session = stripe.checkout.Session.create(
-        payment_method_types=["card"],
-        line_items=line_items,
-        mode="payment",
-        success_url="http://127.0.0.1:8000/orders/",
-        cancel_url="http://127.0.0.1:8000/cart/",
-    )
-
-    Order.objects.create(user=request.user, total=total)
-
-    return redirect(session.url)
+    return render(request, "marketplace/create.html")
 
 
+# =========================
+# SELLER PROFILE PAGE
+# =========================
+def seller_profile(request, username):
+    seller = get_object_or_404(User, username=username)
+    cards = Card.objects.filter(seller=seller)
+
+    return render(request, "marketplace/seller_profile.html", {
+        "seller": seller,
+        "cards": cards
+    })
+
+
+# =========================
+# ADD TO CART
+# =========================
 @login_required
-def ajax_add_to_cart(request, pk):
-    card = Card.objects.get(id=pk)
+def add_to_cart(request, pk):
+    card = get_object_or_404(Card, pk=pk)
 
     item, created = CartItem.objects.get_or_create(
         user=request.user,
@@ -91,28 +92,44 @@ def ajax_add_to_cart(request, pk):
         item.quantity += 1
         item.save()
 
-    return JsonResponse({"success": True})
+    return redirect("cart")
 
 
-def seller_profile(request, username):
-    seller = User.objects.get(username=username)
-    cards = Card.objects.filter(seller=seller)
+# =========================
+# CART VIEW
+# =========================
+@login_required
+def cart(request):
+    items = CartItem.objects.filter(user=request.user)
 
-    return render(request, "marketplace/seller_profile.html", {
-        "seller": seller,
-        "cards": cards
+    total = sum(item.card.price * item.quantity for item in items)
+
+    return render(request, "marketplace/cart.html", {
+        "items": items,
+        "total": total
     })
 
 
+# =========================
+# REMOVE FROM CART
+# =========================
 @login_required
-def dashboard(request):
-    cards = Card.objects.filter(seller=request.user)
-    return render(request, "marketplace/dashboard.html", {"cards": cards})
+def remove_from_cart(request, pk):
+    CartItem.objects.filter(id=pk, user=request.user).delete()
+    return redirect("cart")
+    from django.shortcuts import render, redirect
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login
 
 
-@login_required
-def orders(request):
-    orders = Order.objects.filter(user=request.user)
-    CartItem.objects.filter(user=request.user).delete()
+def register(request):
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect("/")
+    else:
+        form = UserCreationForm()
 
-    return render(request, "marketplace/orders.html", {"orders": orders})
+    return render(request, "registration/register.html", {"form": form})

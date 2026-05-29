@@ -1,33 +1,41 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Register</title>
-</head>
-<body style="font-family:Arial; background:#f5f5f5; padding:40px;">
+{% extends "marketplace/base.html" %}
 
-  <div style="max-width:400px; margin:auto; background:white; padding:20px; border-radius:10px;">
+{% block content %}
 
-    <h2>Create Account</h2>
+<div style="
+    max-width:420px;
+    margin:60px auto;
+    background:#1a1a22;
+    padding:25px;
+    border-radius:14px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.4);
+">
 
-    {% if error %}
-      <p style="color:red;">{{ error }}</p>
-    {% endif %}
+<h2 style="margin-bottom:15px;">Create Account</h2>
 
-    <form method="POST">
-      {% csrf_token %}
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
 
-      <input name="username" placeholder="Username"
-        style="width:100%; padding:8px; margin-bottom:10px;">
-
-      <input name="password" type="password" placeholder="Password"
-        style="width:100%; padding:8px; margin-bottom:10px;">
-
-      <button style="width:100%; padding:10px; background:black; color:white;">
+    <button type="submit" style="
+        width:100%;
+        padding:10px;
+        background:#7c5cff;
+        color:white;
+        border:none;
+        border-radius:10px;
+        cursor:pointer;
+        margin-top:10px;
+    ">
         Register
-      </button>
-    </form>
+    </button>
+</form>
 
-  </div>
+<p style="margin-top:15px;">
+    Already have an account?
+    <a href="/accounts/login/" style="color:#7c5cff;">Login</a>
+</p>
 
-</body>
-</html>
+</div>
+
+{% endblock %}
