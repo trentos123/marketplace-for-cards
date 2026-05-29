@@ -1,0 +1,23 @@
+{% extends "marketplace/base.html" %}
+
+{% block content %}
+
+<h2>Your Dashboard</h2>
+
+<a href="/create/">+ Create Listing</a>
+
+<div style="margin-top:20px;">
+
+{% for card in cards %}
+  <div style="background:white; padding:10px; margin-bottom:10px;">
+    <h3>{{ card.title }}</h3>
+    <p>${{ card.price }}</p>
+    <p>Stock: {{ card.stock }}</p>
+  </div>
+{% empty %}
+  <p>No listings yet.</p>
+{% endfor %}
+
+</div>
+
+{% endblock %}

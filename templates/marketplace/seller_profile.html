@@ -1,0 +1,26 @@
+{% extends "marketplace/base.html" %}
+
+{% block content %}
+
+<h2>{{ seller.username }}'s Store</h2>
+
+<div style="display:grid; grid-template-columns:repeat(4,1fr); gap:15px;">
+
+{% for card in cards %}
+  <div style="background:white; padding:10px; border-radius:10px;">
+    
+    {% if card.image_url %}
+      <img src="{{ card.image_url }}" style="width:100%; height:180px; object-fit:cover;">
+    {% endif %}
+
+    <h3>{{ card.title }}</h3>
+    <p>${{ card.price }}</p>
+
+    <a href="/add/{{ card.id }}/">Add to Cart</a>
+
+  </div>
+{% endfor %}
+
+</div>
+
+{% endblock %}

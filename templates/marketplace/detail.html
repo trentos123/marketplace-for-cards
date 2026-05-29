@@ -1,0 +1,24 @@
+{% extends "marketplace/base.html" %}
+
+{% block content %}
+
+<div style="display:flex;gap:30px;background:white;padding:20px;border-radius:20px;">
+
+    <div style="flex:1;">
+        {% if card.image %}
+            <img src="{{ card.image.url }}" style="width:100%;border-radius:12px;">
+        {% endif %}
+    </div>
+
+    <div style="flex:1;">
+        <h1>{{ card.title }}</h1>
+        <h2>${{ card.price }}</h2>
+
+        <p>{{ card.description }}</p>
+
+        <a class="btn" href="/add/{{ card.id }}/">Add to Cart</a>
+    </div>
+
+</div>
+
+{% endblock %}

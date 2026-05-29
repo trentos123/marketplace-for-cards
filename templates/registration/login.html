@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Login</title>
+
+<style>
+body {
+    margin:0;
+    background:linear-gradient(120deg,#0b0b0f,#1a1a2a);
+    font-family:system-ui;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    height:100vh;
+}
+
+.box {
+    background:#15151c;
+    padding:30px;
+    border-radius:16px;
+    width:320px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.5);
+    animation:pop 0.3s ease;
+}
+
+@keyframes pop {
+    from { transform:scale(0.95); opacity:0; }
+    to { transform:scale(1); opacity:1; }
+}
+
+input {
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+    border-radius:8px;
+    border:none;
+    background:#222;
+    color:white;
+}
+
+button {
+    width:100%;
+    padding:10px;
+    background:#7c5cff;
+    border:none;
+    border-radius:8px;
+    color:white;
+    cursor:pointer;
+}
+
+button:hover {
+    transform:scale(1.03);
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+    <h2>Welcome Back</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button>Login</button>
+    </form>
+</div>
+
+</body>
+</html>

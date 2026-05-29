@@ -1,0 +1,29 @@
+{% extends "marketplace/base.html" %}
+
+{% block content %}
+
+<input id="search" placeholder="Search..." style="margin:20px;padding:10px;width:300px;">
+
+<div class="grid">
+
+{% for c in cards %}
+<div class="card">
+
+    {% if c.image %}
+    <a href="/card/{{c.id}}">
+        <img src="{{ c.image.url }}">
+    </a>
+    {% endif %}
+
+    <h4>{{ c.title }}</h4>
+    <p>${{ c.price }}</p>
+    <p>{{ c.rarity|title }}</p>
+
+    <button onclick="addToCart({{ c.id }})">Add</button>
+
+</div>
+{% endfor %}
+
+</div>
+
+{% endblock %}

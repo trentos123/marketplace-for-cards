@@ -1,0 +1,51 @@
+{% extends "marketplace/base.html" %}
+
+{% block content %}
+
+<h2 style="margin-bottom:20px;">Shopping Cart</h2>
+
+<div style="display:flex; gap:20px; align-items:flex-start;">
+
+  <!-- LEFT: ITEMS -->
+  <div style="flex:2;">
+
+    {% for i in items %}
+    <div style="display:flex; gap:15px; background:white; padding:10px; margin-bottom:10px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+
+      {% if i.card.image_url %}
+        <img src="{{ i.card.image_url }}" style="width:90px; height:120px; object-fit:cover; border-radius:8px;">
+      {% endif %}
+
+      <div style="flex:1;">
+        <h3 style="margin:0;">{{ i.card.title }}</h3>
+        <p style="margin:5px 0;">Quantity: {{ i.quantity }}</p>
+        <p style="margin:5px 0;"><b>${{ i.card.price }}</b></p>
+
+        <a href="/remove/{{ i.id }}" style="color:red; font-size:12px;">Remove</a>
+      </div>
+
+    </div>
+    {% empty %}
+      <p>Your cart is empty.</p>
+    {% endfor %}
+
+  </div>
+
+  <!-- RIGHT: SUMMARY -->
+  <div style="flex:1; background:white; padding:15px; border-radius:10px; height:fit-content; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+
+    <h3>Order Summary</h3>
+
+    <p>Total Items: {{ items|length }}</p>
+    <h2>Total: ${{ total }}</h2>
+
+    <a href="/checkout/"
+       style="display:block; text-align:center; background:black; color:white; padding:10px; border-radius:8px; text-decoration:none;">
+      Checkout
+    </a>
+
+  </div>
+
+</div>
+
+{% endblock %}

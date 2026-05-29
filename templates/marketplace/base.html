@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>TCG Market</title>
+
+<style>
+:root {
+    --bg:#0b0b0f;
+    --panel:#15151c;
+    --panel2:#1c1c25;
+    --text:#ffffff;
+    --muted:#a1a1aa;
+    --accent:#7c5cff;
+    --good:#22c55e;
+}
+
+body {
+    margin:0;
+    font-family:system-ui;
+    background:var(--bg);
+    color:var(--text);
+}
+
+/* NAV */
+.nav {
+    display:flex;
+    justify-content:space-between;
+    padding:16px 24px;
+    background:rgba(0,0,0,0.6);
+    backdrop-filter: blur(10px);
+    position:sticky;
+    top:0;
+    z-index:50;
+}
+
+.nav a {
+    color:white;
+    margin-left:12px;
+    text-decoration:none;
+    opacity:0.8;
+}
+
+.nav a:hover {
+    opacity:1;
+}
+
+/* GRID */
+.grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fill,200px);
+    gap:16px;
+    padding:24px;
+}
+
+/* CARD */
+.card {
+    background:var(--panel);
+    border-radius:14px;
+    overflow:hidden;
+    transform:translateY(0);
+    transition:0.25s;
+    cursor:pointer;
+    box-shadow:0 10px 30px rgba(0,0,0,0.3);
+}
+
+.card:hover {
+    transform:translateY(-6px) scale(1.03);
+}
+
+.card img {
+    width:100%;
+    height:170px;
+    object-fit:cover;
+    transition:0.3s;
+}
+
+.card:hover img {
+    transform:scale(1.08);
+}
+
+/* BUTTON */
+button {
+    background:var(--accent);
+    border:none;
+    color:white;
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+button:hover {
+    transform:scale(1.05);
+}
+
+/* CART DRAWER */
+.cart {
+    position:fixed;
+    right:-420px;
+    top:0;
+    width:360px;
+    height:100%;
+    background:var(--panel);
+    transition:0.35s cubic-bezier(.4,0,.2,1);
+    padding:20px;
+    z-index:100;
+}
+
+.cart.open {
+    right:0;
+}
+
+.overlay {
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.6);
+    opacity:0;
+    pointer-events:none;
+    transition:0.2s;
+}
+
+.overlay.show {
+    opacity:1;
+    pointer-events:auto;
+}
+
+/* TOAST */
+.toast {
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    background:var(--good);
+    padding:12px 16px;
+    border-radius:10px;
+    opacity:0;
+    transform:translateY(20px);
+    transition:0.3s;
+}
+
+.toast.show {
+    opacity:1;
+    transform:translateY(0);
+}
+</style>
+</head>
+
+<body>
+
+<div class="nav">
+    <div><b>TCG MARKET</b></div>
+    <div>
+        <a href="/">Home</a>
+        <a href="#" onclick="toggleCart()">Cart (<span id="cartCount">0</span>)</a>
+        <a href="/dashboard/">Dashboard</a>
+        <a href="/accounts/login/">Login</a>
+    </div>
+</div>
+
+<!-- CART -->
+<div class="cart" id="cart">
+    <h2>Cart</h2>
+    <div id="cartItems">Loading...</div>
+</div>
+
+<div class="overlay" id="overlay" onclick="toggleCart()"></div>
+
+<div class="toast" id="toast">Added to cart</div>
+
+<script>
+let cartCount = 0;
+
+function toggleCart(){
+    document.getElementById("cart").classList.toggle("open");
+    document.getElementById("overlay").classList.toggle("show");
+}
+
+/* AJAX ADD TO CART */
+function addToCart(id){
+    fetch(`/ajax/add/${id}/`, {
+        method:"POST",
+        headers:{
+            "X-CSRFToken":"{{ csrf_token }}"
+        }
+    })
+    .then(r => r.json())
+    .then(data => {
+        cartCount++;
+        document.getElementById("cartCount").innerText = cartCount;
+
+        showToast();
+        syncCart();
+    });
+}
+
+/* LIVE CART SYNC */
+function syncCart(){
+    fetch("/cart/")
+    .then(r => r.text())
+    .then(html => {
+        document.getElementById("cartItems").innerHTML = "Updated";
+    });
+}
+
+/* TOAST */
+function showToast(){
+    const t = document.getElementById("toast");
+    t.classList.add("show");
+    setTimeout(()=>t.classList.remove("show"),1200);
+}
+</script>
+
+{% block content %}{% endblock %}
+
+</body>
+</html>
