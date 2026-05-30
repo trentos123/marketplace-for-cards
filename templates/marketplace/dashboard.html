@@ -1,23 +1,15 @@
-{% extends "marketplace/base.html" %}
+<h1>Dashboard</h1>
 
-{% block content %}
-
-<h2>Your Dashboard</h2>
-
-<a href="/create/">+ Create Listing</a>
-
-<div style="margin-top:20px;">
-
+<h2>Your Cards</h2>
 {% for card in cards %}
-  <div style="background:white; padding:10px; margin-bottom:10px;">
-    <h3>{{ card.title }}</h3>
-    <p>${{ card.price }}</p>
-    <p>Stock: {{ card.stock }}</p>
-  </div>
+  <p>{{ card.title }} - ${{ card.price }}</p>
 {% empty %}
-  <p>No listings yet.</p>
+  <p>No cards listed.</p>
 {% endfor %}
 
-</div>
-
-{% endblock %}
+<h2>Your Orders</h2>
+{% for order in orders %}
+  <p>Order ${{ order.total }} - {{ order.created_at }}</p>
+{% empty %}
+  <p>No orders yet.</p>
+{% endfor %}
