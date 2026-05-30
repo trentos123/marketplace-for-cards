@@ -3,21 +3,11 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# =========================
-# SECURITY
-# =========================
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-only-key")
-DEBUG = os.environ.get("DEBUG", "1") == "1"
+SECRET_KEY = "dev-only-change-me"
+DEBUG = True
 
-ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    ".onrender.com"
-]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", ".onrender.com"]
 
-# =========================
-# APPS
-# =========================
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -28,9 +18,6 @@ INSTALLED_APPS = [
     "marketplace",
 ]
 
-# =========================
-# MIDDLEWARE
-# =========================
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -42,9 +29,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "config.urls"
 
-# =========================
-# TEMPLATES
-# =========================
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -62,9 +46,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-# =========================
-# DATABASE
-# =========================
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -72,41 +53,18 @@ DATABASES = {
     }
 }
 
-# =========================
-# AUTH
-# =========================
+STATIC_URL = "/static/"
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+STATICFILES_DIRS = [BASE_DIR / "static"]
+
 LOGIN_URL = "/accounts/login/"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
-# =========================
-# INTERNATIONALIZATION
-# =========================
-LANGUAGE_CODE = "en-us"
-TIME_ZONE = "UTC"
-USE_I18N = True
-USE_TZ = True
-
-# =========================
-# STATIC FILES
-# =========================
-STATIC_URL = "/static/"
-STATICFILES_DIRS = [BASE_DIR / "static"]
-STATIC_ROOT = BASE_DIR / "staticfiles"
-
-# =========================
-# MEDIA (CARD IMAGES)
-# =========================
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
-
-# =========================
-# DEFAULT AUTO FIELD
-# =========================
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# =========================
-# STRIPE (SECURE)
-# =========================
+# Stripe (DO NOT HARDCODE KEYS)
 STRIPE_PUBLIC_KEY = os.environ.get("STRIPE_PUBLIC_KEY", "")
 STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
