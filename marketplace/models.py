@@ -17,6 +17,9 @@ class Card(models.Model):
     rarity = models.CharField(max_length=20, choices=RARITY, default="common")
     seller = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    # FIX: needed for sorting (optional but recommended)
+    created_at = models.DateTimeField(auto_now_add=True)
+
 
 class CartItem(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

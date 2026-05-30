@@ -8,7 +8,7 @@ from .models import Card, CartItem
 
 
 # =========================
-# HOME (MARKETPLACE)
+# HOME
 # =========================
 def home(request):
     query = request.GET.get("q")
@@ -24,42 +24,32 @@ def home(request):
     elif sort == "price_high":
         cards = cards.order_by("-price")
     else:
-        cards = cards.order_by("-created_at")
+        cards = cards.order_by("-created_at")  # FIXED (now exists)
 
-    return render(request, "marketplace/home.html", {
-        "cards": cards
-    })
+    return render(request, "marketplace/home.html", {"cards": cards})
 
 
 # =========================
-# CARD DETAIL
+# DETAIL
 # =========================
 def detail(request, pk):
     card = get_object_or_404(Card, pk=pk)
-    return render(request, "marketplace/detail.html", {
-        "card": card
-    })
+    return render(request, "marketplace/detail.html", {"card": card})
 
 
 # =========================
-# CREATE CARD (SELLER)
+# CREATE
 # =========================
 @login_required
 def create(request):
     if request.method == "POST":
-        title = request.POST.get("title")
-        description = request.POST.get("description")
-        price = request.POST.get("price")
-        image = request.FILES.get("image")
-
         Card.objects.create(
-            title=title,
-            description=description,
-            price=price,
-            image=image,
+            title=request.POST.get("title"),
+            description=request.POST.get("description"),
+            price=request.POST.get("price"),
+            image=request.FILES.get("image"),
             seller=request.user
         )
-
         return redirect("home")
 
     return render(request, "marketplace/create.html")
@@ -79,7 +69,7 @@ def seller_profile(request, username):
 
 
 # =========================
-# ADD TO CART
+# CART
 # =========================
 @login_required
 def add_to_cart(request, pk):
@@ -97,13 +87,9 @@ def add_to_cart(request, pk):
     return redirect("cart")
 
 
-# =========================
-# CART PAGE
-# =========================
 @login_required
 def cart(request):
     items = CartItem.objects.filter(user=request.user)
-
     total = sum(item.card.price * item.quantity for item in items)
 
     return render(request, "marketplace/cart.html", {
@@ -112,9 +98,6 @@ def cart(request):
     })
 
 
-# =========================
-# REMOVE FROM CART
-# =========================
 @login_required
 def remove_from_cart(request, pk):
     CartItem.objects.filter(id=pk, user=request.user).delete()
@@ -122,7 +105,7 @@ def remove_from_cart(request, pk):
 
 
 # =========================
-# REGISTER (SIGN UP)
+# REGISTER
 # =========================
 def register(request):
     if request.method == "POST":
@@ -134,6 +117,4 @@ def register(request):
     else:
         form = UserCreationForm()
 
-    return render(request, "registration/register.html", {
-        "form": form
-    })
+    return render(request, "registration/register.html", {"form": form})
