@@ -1,12 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login
 
 from .models import Card, CartItem
 
 
 # =========================
-# HOME (MARKETPLACE LISTING)
+# HOME (MARKETPLACE)
 # =========================
 def home(request):
     query = request.GET.get("q")
@@ -30,7 +32,7 @@ def home(request):
 
 
 # =========================
-# CARD DETAIL PAGE
+# CARD DETAIL
 # =========================
 def detail(request, pk):
     card = get_object_or_404(Card, pk=pk)
@@ -40,7 +42,7 @@ def detail(request, pk):
 
 
 # =========================
-# CREATE CARD (SELLER UPLOAD)
+# CREATE CARD (SELLER)
 # =========================
 @login_required
 def create(request):
@@ -64,7 +66,7 @@ def create(request):
 
 
 # =========================
-# SELLER PROFILE PAGE
+# SELLER PROFILE
 # =========================
 def seller_profile(request, username):
     seller = get_object_or_404(User, username=username)
@@ -96,7 +98,7 @@ def add_to_cart(request, pk):
 
 
 # =========================
-# CART VIEW
+# CART PAGE
 # =========================
 @login_required
 def cart(request):
@@ -117,11 +119,11 @@ def cart(request):
 def remove_from_cart(request, pk):
     CartItem.objects.filter(id=pk, user=request.user).delete()
     return redirect("cart")
-    from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import login
 
 
+# =========================
+# REGISTER (SIGN UP)
+# =========================
 def register(request):
     if request.method == "POST":
         form = UserCreationForm(request.POST)
@@ -132,4 +134,6 @@ def register(request):
     else:
         form = UserCreationForm()
 
-    return render(request, "registration/register.html", {"form": form})
+    return render(request, "registration/register.html", {
+        "form": form
+    })

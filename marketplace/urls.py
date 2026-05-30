@@ -5,12 +5,8 @@ urlpatterns = [
     path("", views.home, name="home"),
     path("card/<int:pk>/", views.detail, name="detail"),
     path("create/", views.create, name="create"),
-
+    path("seller/<str:username>/", views.seller_profile, name="seller_profile"),
     path("add/<int:pk>/", views.add_to_cart, name="add_to_cart"),
     path("cart/", views.cart, name="cart"),
-
-    path("checkout/", views.checkout, name="checkout"),
-    path("success/", views.success, name="success"),
-    path("cancel/", views.cancel, name="cancel"),
-    path("ajax/add-to-cart/<int:pk>/", views.ajax_add_to_cart, name="ajax_add_to_cart"),
-    ]
+    path("remove/<int:pk>/", views.remove_from_cart, name="remove_from_cart"),
+]
