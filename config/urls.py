@@ -14,6 +14,6 @@ urlpatterns = [
     path("register/", marketplace_views.register, name="register"),
 ]
 
-# ✅ MEDIA SERVING (LOCAL + RENDER FIX)
+# MEDIA FIX (THIS WAS MISSING/WRONG)
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -9,7 +9,9 @@ from .models import Card, CartItem, Order
 
 def home(request):
     cards = Card.objects.all().order_by("-created_at")
-    return render(request, "marketplace/home.html", {"cards": cards})
+    return render(request, "marketplace/home.html", {
+        "cards": cards
+    })
 
 
 def detail(request, pk):
@@ -34,7 +36,7 @@ def create(request):
 
 
 def seller_profile(request, username):
-    cards = Card.objects.filter(seller__username=username)
+    cards = Card.objects.filter(seller__username=username).order_by("-created_at")
     return render(request, "marketplace/seller_profile.html", {"cards": cards})
 
 
@@ -57,6 +59,7 @@ def add_to_cart(request, pk):
 @login_required
 def cart(request):
     items = CartItem.objects.filter(user=request.user)
+
     total = sum(item.card.price * item.quantity for item in items)
 
     return render(request, "marketplace/cart.html", {
@@ -73,8 +76,8 @@ def remove_from_cart(request, pk):
 
 @login_required
 def dashboard(request):
-    cards = Card.objects.filter(seller=request.user)
-    orders = Order.objects.filter(user=request.user)
+    cards = Card.objects.filter(seller=request.user).order_by("-created_at")
+    orders = Order.objects.filter(user=request.user).order_by("-created_at")
 
     return render(request, "marketplace/dashboard.html", {
         "cards": cards,

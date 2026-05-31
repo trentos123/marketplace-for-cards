@@ -2,66 +2,38 @@
 
 {% block content %}
 
-<div style="padding:20px;">
+<h2 style="padding:20px;">Marketplace</h2>
 
-    <!-- SEARCH -->
-    <input id="search"
-           placeholder="Search cards..."
-           style="padding:10px;width:300px;border-radius:8px;border:none;margin-bottom:20px;">
+<div class="grid">
 
-    <!-- GRID -->
-    <div class="grid" id="grid">
+    {% for c in cards %}
+    <div class="card">
 
-        {% for c in cards %}
-        <div class="card" data-title="{{ c.title|lower }}">
+        <a href="/card/{{ c.id }}">
 
-            <a href="{% url 'detail' c.id %}">
-
-                {% if c.image %}
-                    <img src="{{ c.image.url }}" alt="{{ c.title }}">
-                {% else %}
-                    <div style="height:170px;display:flex;align-items:center;justify-content:center;background:#222;">
-                        No Image
-                    </div>
-                {% endif %}
-
-            </a>
-
-            <h4>{{ c.title }}</h4>
-            <p>${{ c.price }}</p>
-            <p>{{ c.rarity|title }}</p>
-
-            <!-- SAFE BUTTON -->
-            {% if user.is_authenticated %}
-                <button onclick="addToCart({{ c.id }})">Add to Cart</button>
+            {% if c.image %}
+                <img src="{{ c.image.url }}">
             {% else %}
-                <a href="/accounts/login/">
-                    <button>Login to Buy</button>
-                </a>
+                <div style="height:160px;display:flex;align-items:center;justify-content:center;background:#333;">
+                    No Image
+                </div>
             {% endif %}
 
-        </div>
-        {% empty %}
-            <p>No cards available yet. Create one in dashboard.</p>
-        {% endfor %}
+        </a>
+
+        <h3>{{ c.title }}</h3>
+        <p>${{ c.price }}</p>
+        <p>{{ c.rarity|title }}</p>
+
+        <a href="/add/{{ c.id }}/">
+            <button>Add to Cart</button>
+        </a>
 
     </div>
+    {% empty %}
+        <p style="padding:20px;">No cards yet. Be the first seller.</p>
+    {% endfor %}
 
 </div>
-
-<!-- SEARCH SCRIPT -->
-<script>
-const search = document.getElementById("search");
-const cards = document.querySelectorAll(".card");
-
-search.addEventListener("input", function () {
-    const val = this.value.toLowerCase();
-
-    cards.forEach(card => {
-        const title = card.dataset.title;
-        card.style.display = title.includes(val) ? "block" : "none";
-    });
-});
-</script>
 
 {% endblock %}

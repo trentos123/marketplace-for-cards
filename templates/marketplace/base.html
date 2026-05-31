@@ -1,56 +1,94 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>TCG Market</title>
+    <title>TCG Market</title>
 
-<style>
-/* keep your CSS exactly as-is */
-:root {
-    --bg:#0b0b0f;
-    --panel:#15151c;
-    --panel2:#1c1c25;
-    --text:#ffffff;
-    --muted:#a1a1aa;
-    --accent:#7c5cff;
-    --good:#22c55e;
-}
+    <style>
+        body {
+            margin: 0;
+            font-family: system-ui;
+            background: #0b0b0f;
+            color: white;
+        }
 
-body { margin:0; font-family:system-ui; background:var(--bg); color:var(--text); }
+        /* NAV */
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background: #111;
+        }
 
-.nav {
-    display:flex;
-    justify-content:space-between;
-    padding:16px 24px;
-    background:rgba(0,0,0,0.6);
-    backdrop-filter: blur(10px);
-    position:sticky;
-    top:0;
-}
+        .nav a {
+            color: white;
+            margin-right: 12px;
+            text-decoration: none;
+        }
 
-.nav a { color:white; margin-left:12px; text-decoration:none; opacity:0.8; }
-.nav a:hover { opacity:1; }
-</style>
+        .nav a:hover {
+            text-decoration: underline;
+        }
+
+        /* GRID */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 16px;
+            padding: 20px;
+        }
+
+        /* CARD */
+        .card {
+            background: #1a1a22;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .card img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        button {
+            padding: 8px 10px;
+            border: none;
+            background: #7c5cff;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+    </style>
 </head>
 
 <body>
 
+<!-- NAV -->
 <div class="nav">
-    <div><b>TCG MARKET</b></div>
-
     <div>
         <a href="/">Home</a>
         <a href="/dashboard/">Dashboard</a>
+        <a href="/cart/">Cart</a>
         <a href="/create/">Sell</a>
+    </div>
 
+    <div>
         {% if user.is_authenticated %}
             <span>Hi {{ user.username }}</span>
             <a href="/accounts/logout/">Logout</a>
         {% else %}
             <a href="/accounts/login/">Login</a>
+            <a href="/register/">Register</a>
         {% endif %}
     </div>
 </div>
 
+<!-- PAGE CONTENT -->
 {% block content %}{% endblock %}
 
 </body>
