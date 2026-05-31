@@ -6,41 +6,52 @@ from django.contrib.auth import login
 from .models import Card, CartItem, Order
 
 
-# HOME
+# =========================
+# HOME PAGE
+# =========================
 def home(request):
-    cards = Card.objects.all().order_by("-id")
+    cards = Card.objects.all().order_by("-created_at")
     return render(request, "marketplace/home.html", {"cards": cards})
 
 
-# DETAIL
+# =========================
+# CARD DETAIL
+# =========================
 def detail(request, pk):
     card = get_object_or_404(Card, pk=pk)
     return render(request, "marketplace/detail.html", {"card": card})
 
 
-# CREATE SELL LISTING
+# =========================
+# CREATE LISTING
+# =========================
 @login_required
 def create(request):
     if request.method == "POST":
         Card.objects.create(
-            title=request.POST["title"],
-            description=request.POST["description"],
-            price=request.POST["price"],
+            title=request.POST.get("title"),
+            description=request.POST.get("description"),
+            price=request.POST.get("price"),
+            rarity=request.POST.get("rarity"),
             image=request.FILES.get("image"),
-            seller=request.user
+            seller=request.user,
         )
         return redirect("home")
 
     return render(request, "marketplace/create.html")
 
 
-# SELLER PAGE
+# =========================
+# SELLER PROFILE
+# =========================
 def seller_profile(request, username):
-    cards = Card.objects.filter(seller__username=username)
+    cards = Card.objects.filter(seller__username=username).order_by("-created_at")
     return render(request, "marketplace/seller_profile.html", {"cards": cards})
 
 
-# CART
+# =========================
+# ADD TO CART
+# =========================
 @login_required
 def add_to_cart(request, pk):
     card = get_object_or_404(Card, pk=pk)
@@ -57,10 +68,14 @@ def add_to_cart(request, pk):
     return redirect("cart")
 
 
+# =========================
+# CART
+# =========================
 @login_required
 def cart(request):
     items = CartItem.objects.filter(user=request.user)
-    total = sum(i.card.price * i.quantity for i in items)
+
+    total = sum(item.card.price * item.quantity for item in items)
 
     return render(request, "marketplace/cart.html", {
         "items": items,
@@ -68,31 +83,42 @@ def cart(request):
     })
 
 
+# =========================
+# REMOVE ITEM
+# =========================
 @login_required
 def remove_from_cart(request, pk):
     CartItem.objects.filter(id=pk, user=request.user).delete()
     return redirect("cart")
 
 
+# =========================
 # CHECKOUT
+# =========================
 @login_required
 def checkout(request):
     items = CartItem.objects.filter(user=request.user)
-    total = sum(i.card.price * i.quantity for i in items)
+
+    total = sum(item.card.price * item.quantity for item in items)
 
     if request.method == "POST":
         Order.objects.create(user=request.user, total=total)
         items.delete()
         return redirect("dashboard")
 
-    return render(request, "marketplace/checkout.html", {"total": total})
+    return render(request, "marketplace/checkout.html", {
+        "items": items,
+        "total": total
+    })
 
 
+# =========================
 # DASHBOARD
+# =========================
 @login_required
 def dashboard(request):
-    cards = Card.objects.filter(seller=request.user)
-    orders = Order.objects.filter(user=request.user)
+    cards = Card.objects.filter(seller=request.user).order_by("-created_at")
+    orders = Order.objects.filter(user=request.user).order_by("-created_at")
 
     return render(request, "marketplace/dashboard.html", {
         "cards": cards,
@@ -100,13 +126,15 @@ def dashboard(request):
     })
 
 
+# =========================
 # REGISTER
+# =========================
 def register(request):
     form = UserCreationForm(request.POST or None)
 
     if form.is_valid():
         user = form.save()
         login(request, user)
-        return redirect("/")
+        return redirect("home")
 
     return render(request, "registration/register.html", {"form": form})

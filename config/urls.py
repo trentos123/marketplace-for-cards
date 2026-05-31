@@ -7,10 +7,14 @@ from django.conf.urls.static import static
 urlpatterns = [
     path("admin/", admin.site.urls),
 
+    # marketplace app
     path("", include("marketplace.urls")),
 
+    # auth system
     path("accounts/", include("django.contrib.auth.urls")),
-    path("accounts/register/", views.register),
+
+    # FIXED register routes
+    path("accounts/register/", views.register, name="register"),
     path("register/", views.register, name="register"),
 ]
 
