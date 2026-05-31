@@ -3,7 +3,7 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "dev-only-change-me"
+SECRET_KEY = "dev-only"
 DEBUG = True
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", ".onrender.com"]
@@ -53,18 +53,16 @@ DATABASES = {
     }
 }
 
+# ✅ STATIC (YOU WERE MISSING THIS)
 STATIC_URL = "/static/"
+STATICFILES_DIRS = [BASE_DIR / "static"]
+
+# ✅ MEDIA (THIS FIXES IMAGE UPLOADS)
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
-
-STATICFILES_DIRS = [BASE_DIR / "static"]
 
 LOGIN_URL = "/accounts/login/"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-# Stripe (DO NOT HARDCODE KEYS)
-STRIPE_PUBLIC_KEY = os.environ.get("STRIPE_PUBLIC_KEY", "")
-STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")

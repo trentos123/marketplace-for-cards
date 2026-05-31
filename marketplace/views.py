@@ -2,37 +2,29 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
+from decimal import Decimal
 
 from .models import Card, CartItem, Order
 
 
-# =========================
-# HOME PAGE
-# =========================
 def home(request):
     cards = Card.objects.all().order_by("-created_at")
     return render(request, "marketplace/home.html", {"cards": cards})
 
 
-# =========================
-# CARD DETAIL
-# =========================
 def detail(request, pk):
     card = get_object_or_404(Card, pk=pk)
     return render(request, "marketplace/detail.html", {"card": card})
 
 
-# =========================
-# CREATE LISTING
-# =========================
 @login_required
 def create(request):
     if request.method == "POST":
         Card.objects.create(
             title=request.POST.get("title"),
-            description=request.POST.get("description"),
-            price=request.POST.get("price"),
-            rarity=request.POST.get("rarity"),
+            description=request.POST.get("description", ""),
+            price=Decimal(request.POST.get("price") or 0),
+            rarity=request.POST.get("rarity", "common"),
             image=request.FILES.get("image"),
             seller=request.user,
         )
@@ -41,17 +33,11 @@ def create(request):
     return render(request, "marketplace/create.html")
 
 
-# =========================
-# SELLER PROFILE
-# =========================
 def seller_profile(request, username):
-    cards = Card.objects.filter(seller__username=username).order_by("-created_at")
+    cards = Card.objects.filter(seller__username=username)
     return render(request, "marketplace/seller_profile.html", {"cards": cards})
 
 
-# =========================
-# ADD TO CART
-# =========================
 @login_required
 def add_to_cart(request, pk):
     card = get_object_or_404(Card, pk=pk)
@@ -68,13 +54,9 @@ def add_to_cart(request, pk):
     return redirect("cart")
 
 
-# =========================
-# CART
-# =========================
 @login_required
 def cart(request):
     items = CartItem.objects.filter(user=request.user)
-
     total = sum(item.card.price * item.quantity for item in items)
 
     return render(request, "marketplace/cart.html", {
@@ -83,42 +65,16 @@ def cart(request):
     })
 
 
-# =========================
-# REMOVE ITEM
-# =========================
 @login_required
 def remove_from_cart(request, pk):
     CartItem.objects.filter(id=pk, user=request.user).delete()
     return redirect("cart")
 
 
-# =========================
-# CHECKOUT
-# =========================
-@login_required
-def checkout(request):
-    items = CartItem.objects.filter(user=request.user)
-
-    total = sum(item.card.price * item.quantity for item in items)
-
-    if request.method == "POST":
-        Order.objects.create(user=request.user, total=total)
-        items.delete()
-        return redirect("dashboard")
-
-    return render(request, "marketplace/checkout.html", {
-        "items": items,
-        "total": total
-    })
-
-
-# =========================
-# DASHBOARD
-# =========================
 @login_required
 def dashboard(request):
-    cards = Card.objects.filter(seller=request.user).order_by("-created_at")
-    orders = Order.objects.filter(user=request.user).order_by("-created_at")
+    cards = Card.objects.filter(seller=request.user)
+    orders = Order.objects.filter(user=request.user)
 
     return render(request, "marketplace/dashboard.html", {
         "cards": cards,
@@ -126,9 +82,6 @@ def dashboard(request):
     })
 
 
-# =========================
-# REGISTER
-# =========================
 def register(request):
     form = UserCreationForm(request.POST or None)
 

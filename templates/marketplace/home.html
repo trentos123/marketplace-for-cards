@@ -2,28 +2,66 @@
 
 {% block content %}
 
-<input id="search" placeholder="Search..." style="margin:20px;padding:10px;width:300px;">
+<div style="padding:20px;">
 
-<div class="grid">
+    <!-- SEARCH -->
+    <input id="search"
+           placeholder="Search cards..."
+           style="padding:10px;width:300px;border-radius:8px;border:none;margin-bottom:20px;">
 
-{% for c in cards %}
-<div class="card">
+    <!-- GRID -->
+    <div class="grid" id="grid">
 
-    {% if c.image %}
-    <a href="/card/{{c.id}}">
-        <img src="{{ c.image.url }}">
-    </a>
-    {% endif %}
+        {% for c in cards %}
+        <div class="card" data-title="{{ c.title|lower }}">
 
-    <h4>{{ c.title }}</h4>
-    <p>${{ c.price }}</p>
-    <p>{{ c.rarity|title }}</p>
+            <a href="{% url 'detail' c.id %}">
 
-    <button onclick="addToCart({{ c.id }})">Add</button>
+                {% if c.image %}
+                    <img src="{{ c.image.url }}" alt="{{ c.title }}">
+                {% else %}
+                    <div style="height:170px;display:flex;align-items:center;justify-content:center;background:#222;">
+                        No Image
+                    </div>
+                {% endif %}
+
+            </a>
+
+            <h4>{{ c.title }}</h4>
+            <p>${{ c.price }}</p>
+            <p>{{ c.rarity|title }}</p>
+
+            <!-- SAFE BUTTON -->
+            {% if user.is_authenticated %}
+                <button onclick="addToCart({{ c.id }})">Add to Cart</button>
+            {% else %}
+                <a href="/accounts/login/">
+                    <button>Login to Buy</button>
+                </a>
+            {% endif %}
+
+        </div>
+        {% empty %}
+            <p>No cards available yet. Create one in dashboard.</p>
+        {% endfor %}
+
+    </div>
 
 </div>
-{% endfor %}
 
-</div>
+<!-- SEARCH SCRIPT -->
+<script>
+const search = document.getElementById("search");
+const cards = document.querySelectorAll(".card");
+
+search.addEventListener("input", function () {
+    const val = this.value.toLowerCase();
+
+    cards.forEach(card => {
+        const title = card.dataset.title;
+        card.style.display = title.includes(val) ? "block" : "none";
+    });
+});
+</script>
 
 {% endblock %}
