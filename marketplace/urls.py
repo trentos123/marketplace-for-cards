@@ -5,12 +5,14 @@ urlpatterns = [
     path("", views.home, name="home"),
     path("card/<int:pk>/", views.detail, name="detail"),
 
-    path("create/", views.create, name="create"),
-    path("seller/<str:username>/", views.seller_profile, name="seller_profile"),
-
     path("add/<int:pk>/", views.add_to_cart, name="add_to_cart"),
     path("cart/", views.cart, name="cart"),
     path("remove/<int:pk>/", views.remove_from_cart, name="remove_from_cart"),
 
-    path("dashboard/", views.dashboard, name="dashboard"),
+    path("checkout/", views.checkout, name="checkout"),
+    path("payment-success/", views.payment_success, name="payment_success"),
+
+    path("stripe/webhook/", views.stripe_webhook, name="stripe_webhook"),
+
+    path("register/", views.register, name="register"),
 ]

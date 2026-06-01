@@ -1,12 +1,17 @@
 from pathlib import Path
 import os
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "dev-only"
-DEBUG = True
+SECRET_KEY = os.getenv("SECRET_KEY", "dev-only")
+DEBUG = os.getenv("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", ".onrender.com"]
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    ".onrender.com"
+]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -20,6 +25,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -47,26 +53,20 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    "default": dj_database_url.config(
+        default="sqlite:///db.sqlite3"
+    )
 }
 
-# ✅ STATIC (YOU WERE MISSING THIS)
 STATIC_URL = "/static/"
-
-STATICFILES_DIRS = [BASE_DIR / "static"]
-
-# REQUIRED FOR DEPLOY
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# ✅ MEDIA (THIS FIXES IMAGE UPLOADS)
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-LOGIN_URL = "/accounts/login/"
-LOGIN_REDIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = "/"
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
+STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
+STRIPE_CURRENCY = "usd"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
