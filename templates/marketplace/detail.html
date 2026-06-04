@@ -2,22 +2,17 @@
 
 {% block content %}
 
-<div style="display:flex;gap:30px;background:white;padding:20px;border-radius:20px;">
+<div style="max-width:600px; margin:auto; background:white; padding:20px;">
 
-    <div style="flex:1;">
-        {% if card.image %}
-            <img src="{{ card.image.url }}" style="width:100%;border-radius:12px;">
-        {% endif %}
-    </div>
+  {% if card.image %}
+    <img src="{{ card.image.url }}" style="width:100%; height:300px; object-fit:cover;">
+  {% endif %}
 
-    <div style="flex:1;">
-        <h1>{{ card.title }}</h1>
-        <h2>${{ card.price }}</h2>
+  <h1>{{ card.title }}</h1>
+  <p>{{ card.description }}</p>
+  <h2>${{ card.price }}</h2>
 
-        <p>{{ card.description }}</p>
-
-        <a class="btn" href="/add/{{ card.id }}/">Add to Cart</a>
-    </div>
+  <a href="/add/{{ card.id }}/">Add to Cart</a>
 
 </div>
 

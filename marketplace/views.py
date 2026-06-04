@@ -61,7 +61,7 @@ def remove_from_cart(request, pk):
     return redirect("cart")
 
 
-# ---------------- CHECKOUT ----------------
+# ---------------- STRIPE CHECKOUT ----------------
 @login_required
 def checkout(request):
     items = CartItem.objects.filter(user=request.user)
@@ -86,7 +86,7 @@ def checkout(request):
         mode="payment",
         line_items=line_items,
         metadata={"user_id": request.user.id},
-        success_url=request.build_absolute_uri("/payment-success/"),
+        success_url=request.build_absolute_uri("/success/"),
         cancel_url=request.build_absolute_uri("/cart/"),
     )
 
@@ -98,7 +98,7 @@ def payment_success(request):
     return render(request, "marketplace/success.html")
 
 
-# ---------------- WEBHOOK (FULL SYSTEM) ----------------
+# ---------------- WEBHOOK ----------------
 @csrf_exempt
 def stripe_webhook(request):
     payload = request.body
@@ -115,9 +115,6 @@ def stripe_webhook(request):
 
     if event["type"] == "checkout.session.completed":
         session = event["data"]["object"]
-
-        if Order.objects.filter(stripe_session_id=session["id"]).exists():
-            return HttpResponse(status=200)
 
         user = User.objects.get(id=session["metadata"]["user_id"])
         items = CartItem.objects.filter(user=user)
