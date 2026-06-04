@@ -1,18 +1,14 @@
 from django.urls import path
+from django.contrib.auth import views as auth_views
 from . import views
 
 urlpatterns = [
     path("", views.home, name="home"),
-    path("card/<int:pk>/", views.detail, name="detail"),
-
-    path("add/<int:pk>/", views.add_to_cart, name="add_to_cart"),
+    path("create/", views.create, name="create"),
+    path("dashboard/", views.dashboard, name="dashboard"),
     path("cart/", views.cart, name="cart"),
-    path("remove/<int:pk>/", views.remove_from_cart, name="remove_from_cart"),
 
-    path("checkout/", views.checkout, name="checkout"),
-    path("payment-success/", views.payment_success, name="payment_success"),
-
-    path("stripe/webhook/", views.stripe_webhook, name="stripe_webhook"),
-
-    path("register/", views.register, name="register"),
+    # LOGIN (THIS IS IMPORTANT)
+    path("login/", auth_views.LoginView.as_view(), name="login"),
+    path("logout/", auth_views.LogoutView.as_view(), name="logout"),
 ]
